@@ -1,10 +1,8 @@
 import requests
 from twilio.rest import Client
 
-# VIRTUAL_TWILIO_NUMBER = "your virtual twilio number"
-VIRTUAL_TWILIO_NUMBER = "+16813293122"
-# VERIFIED_NUMBER = "your own phone number verified with Twilio"
-VERIFIED_NUMBER = "+923133795700"
+VIRTUAL_TWILIO_NUMBER = "your virtual twilio number"
+VERIFIED_NUMBER = "your own phone number verified with Twilio"
 
 STOCK_NAME = "TSLA"
 COMPANY_NAME = "Tesla Inc"
@@ -12,26 +10,19 @@ COMPANY_NAME = "Tesla Inc"
 STOCK_ENDPOINT = "https://www.alphavantage.co/query"
 NEWS_ENDPOINT = "https://newsapi.org/v2/everything"
 
-# STOCK_API_KEY = "YOUR OWN API KEY FROM ALPHAVANTAGE"
-STOCK_API_KEY = "R6OPSY6CI1XICQLG"
-# NEWS_API_KEY = "YOUR OWN API KEY FROM NEWSAPI"
-NEWS_API_KEY = "2564f8d190cd4d20966cc9f3f08a6b6b"
-# TWILIO_SID = "YOUR TWILIO ACCOUNT SID"
-TWILIO_SID = "AC9077773b1f7eacaf334ba059cc521332"
-# TWILIO_AUTH_TOKEN = "YOUR TWILIO AUTH TOKEN"
-TWILIO_AUTH_TOKEN = "335aad38ca9d52e8007aaa020a2e6c8d"
+STOCK_API_KEY = "YOUR OWN API KEY FROM ALPHAVANTAGE"
+NEWS_API_KEY = "YOUR OWN API KEY FROM NEWSAPI"
+TWILIO_SID = "YOUR TWILIO ACCOUNT SID"
+TWILIO_AUTH_TOKEN = "YOUR TWILIO AUTH TOKEN"
 
-## STEP 1: Use https://www.alphavantage.co/documentation/#daily
-# When stock price increase/decreases by 5% between yesterday and the day before yesterday then print("Get News").
-
-# Get yesterday's closing stock price
+# Use https://www.alphavantage.co/documentation/#daily
 stock_params = {
-    # "function": "TIME_SERIES_DAILY",
-    "function": "TIME_SERIES_DAILY_ADJUSTED",
+    "function": "TIME_SERIES_DAILY",
     "symbol": STOCK_NAME,
     "apikey": STOCK_API_KEY,
 }
 
+# Get yesterday's closing stock price
 response = requests.get(STOCK_ENDPOINT, params=stock_params)
 data = response.json()["Time Series (Daily)"]
 data_list = [value for (key, value) in data.items()]
@@ -56,10 +47,8 @@ else:
 diff_percent = round((difference / float(yesterday_closing_price)) * 100)
 print(diff_percent)
 
-## STEP 2: Instead of printing ("Get News"), actually get the first 3 news pieces for the COMPANY_NAME.
 
-# Instead of printing ("Get News"), use the News API to get articles related to the COMPANY_NAME.
-# If difference percentage is greater than 5 then print("Get News").
+# If difference percentage is greater than 5 then send the three news through SMS.
 if abs(diff_percent) > 1:
     news_params = {
         "apiKey": NEWS_API_KEY,
@@ -73,8 +62,7 @@ if abs(diff_percent) > 1:
     three_articles = articles[:3]
     print(three_articles)
 
-    ## STEP 3: Use Twilio to send a seperate message with each article's title and description to your phone number.
-
+    # Use Twilio to send a seperate message with each article's title and description to your phone number.
     # Create a new list of the first 3 article's headline and description using list comprehension.
     formatted_articles = [
         f"\n\n{STOCK_NAME}: {up_down}{diff_percent}%\nHeadline: {article['title']}. \nBrief: {article['description']}" for
